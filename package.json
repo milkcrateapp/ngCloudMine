@@ -1,0 +1,26 @@
+{
+  "name": "ngCloudmine",
+  "version": "0.0.0",
+  "description": "Angularifying the Cloudmine JS SDK.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "keywords": [
+    "ng",
+    "angular",
+    "cloudmine",
+    "baas",
+    "mbaas",
+    "js"
+  ],
+  "author": "Jason Cox",
+  "license": "MIT"
+}

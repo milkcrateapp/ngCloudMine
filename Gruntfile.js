@@ -1,11 +1,30 @@
 module.exports = function(grunt) {
-  grunt.registerTask('hello', function() {
-    console.log('world');
-  });
+  var gruntInit = {};
 
-  grunt.registerTask('default', ['hello']);
+  /**
+   * Project settings
+   */
+  gruntInit.pkg = grunt.file.readJSON('package.json');
 
-  grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json')
-  });
+
+  /**
+   * Testing
+   */
+  grunt.registerTask('test', ['karma']);
+
+  grunt.loadNpmTasks('grunt-karma');
+  gruntInit.karma = {
+    unit: {
+      configFile: 'karma.conf.js',
+      background: false
+    }
+  };
+
+
+  /**
+   * Tasks
+   */
+  grunt.registerTask('default', ['test']);
+
+  grunt.initConfig(gruntInit);
 };

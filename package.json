@@ -28,6 +28,7 @@
     "grunt-karma": "^0.12.1",
     "karma-chrome-launcher": "^0.2.0",
     "karma-mocha": "^0.2.0",
-    "mocha": "^2.3.2"
+    "mocha": "^2.3.2",
+    "karma-sinon-chai": "^1.1.0"
   }
 }

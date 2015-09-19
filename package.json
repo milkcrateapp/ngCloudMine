@@ -22,5 +22,8 @@
     "js"
   ],
   "author": "Jason Cox",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "grunt-cli": "^0.1.13"
+  }
 }

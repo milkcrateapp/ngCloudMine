@@ -24,6 +24,10 @@
   "author": "Jason Cox",
   "license": "MIT",
   "devDependencies": {
-    "grunt-cli": "^0.1.13"
+    "grunt-cli": "^0.1.13",
+    "grunt-karma": "^0.12.1",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-mocha": "^0.2.0",
+    "mocha": "^2.3.2"
   }
 }

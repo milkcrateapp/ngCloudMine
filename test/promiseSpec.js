@@ -1,24 +1,20 @@
 describe('promise', function() {
   var wsStub = {
     search: function(){},
-    login: function(){}
-  };
-  var cloudmine = {
-    WebServices: function() {
-      return wsStub;
-    }
+    login: function(){},
+    logout: function(){}
   };
 
   var $rootScope = null;
   var cmWS = null;
 
   beforeEach(function() {
-    window.cloudmine = cloudmine;
     module('ngCloudMine');
   });
 
   beforeEach(function() {
     inject(function($injector) {
+      window.ws = wsStub;
       $rootScope = $injector.get('$rootScope');
       cmWS = $injector.get('cmWS');
     });
@@ -73,6 +69,22 @@ describe('promise', function() {
     expect(wsStub.search.getCall(0).args[1]).to.deep.equal({option: '1'});
 
     expect(results).to.equal('data');
+  });
+
+  it('returns an angular promise when logging out', function() {
+    expect(cmWS.logout).to.be.ok;
+
+    sinon.stub(wsStub, 'logout', function() {
+      return {
+        on: function() {
+          return {
+            on: function() {}
+          };
+        }
+      };
+    });
+
+    expect(cmWS.logout().then).to.be.ok;
   });
 
   it('returns an angular promise when logging in', function() {

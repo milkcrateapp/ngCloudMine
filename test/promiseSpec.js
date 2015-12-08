@@ -1,6 +1,7 @@
 describe('promise', function() {
   var wsStub = {
     search: function(){},
+    set: function(){},
     login: function(){},
     logout: function(){}
   };
@@ -21,12 +22,17 @@ describe('promise', function() {
   });
 
   afterEach(function() {
-    if (wsStub.search.restore) {
-      wsStub.search.restore();
-    }
-    if (wsStub.login.restore) {
-      wsStub.login.restore();
-    }
+    var methodList = [
+      'search', 'set', 'login', 'logout'
+    ];
+
+    methodList.forEach(
+      function(method) {
+        if (wsStub[method].restore) {
+          wsStub[method].restore();
+        }
+      }
+    );
   });
 
   it('returns an angular promise when searching', function() {
@@ -69,6 +75,22 @@ describe('promise', function() {
     expect(wsStub.search.getCall(0).args[1]).to.deep.equal({option: '1'});
 
     expect(results).to.equal('data');
+  });
+
+  it('returns an angular promise when saving', function() {
+    expect(cmWS.set).to.be.ok;
+
+    sinon.stub(wsStub, 'set', function() {
+      return {
+        on: function() {
+          return {
+            on: function() {}
+          };
+        }
+      };
+    });
+
+    expect(cmWS.set().then).to.be.ok;
   });
 
   it('returns an angular promise when logging out', function() {

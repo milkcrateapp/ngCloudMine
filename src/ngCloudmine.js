@@ -41,6 +41,20 @@ angular.module('ngCloudMine', [])
       return deferred.promise;
     },
 
+    update: function(id, object, options) {
+      deferred = $q.defer();
+
+      window.ws.update(id, object, options)
+      .on('success', function(data, response) {
+        deferred.resolve(data, response);
+      })
+      .on('error', function(err, response) {
+        deferred.reject(err, response);
+      });
+
+      return deferred.promise;
+    },
+
     login: function(email, password, options) {
       deferred = $q.defer();
 

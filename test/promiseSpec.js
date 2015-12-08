@@ -2,6 +2,7 @@ describe('promise', function() {
   var wsStub = {
     search: function(){},
     set: function(){},
+    update: function(){},
     login: function(){},
     logout: function(){}
   };
@@ -23,7 +24,7 @@ describe('promise', function() {
 
   afterEach(function() {
     var methodList = [
-      'search', 'set', 'login', 'logout'
+      'search', 'set', 'update', 'login', 'logout'
     ];
 
     methodList.forEach(
@@ -91,6 +92,22 @@ describe('promise', function() {
     });
 
     expect(cmWS.set().then).to.be.ok;
+  });
+
+  it('returns an angular promise when updating', function() {
+    expect(cmWS.update).to.be.ok;
+
+    sinon.stub(wsStub, 'update', function() {
+      return {
+        on: function() {
+          return {
+            on: function() {}
+          };
+        }
+      };
+    });
+
+    expect(cmWS.update().then).to.be.ok;
   });
 
   it('returns an angular promise when logging out', function() {

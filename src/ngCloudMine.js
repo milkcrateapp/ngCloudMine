@@ -1,70 +1,41 @@
 angular.module('ngCloudMine', [])
 
 .service('cmWS', ['$q', function($q) {
+  function deferSuccessAndError(method, args) {
+    var deferred = $q.defer();
+
+    window.ws[method].apply(this, args)
+    .on('success', function(data, response) {
+      deferred.resolve(data, response);
+    }).on('error', function(error) {
+      deferred.reject(error);
+    });
+
+    return deferred.promise;
+  };
 
   return {
     search: function(query, options) {
-      deferred = $q.defer();
+      return deferSuccessAndError('search', [query, options]);
+    },
 
-      window.ws.search(query, options).on('success', function(data, response) {
-        deferred.resolve(data, response);
-      }).on('error', function(error) {
-        deferred.reject(error);
-      });
-
-      return deferred.promise;
+    getSearchCount: function() {
     },
 
     logout: function(email, password, options) {
-      deferred = $q.defer();
-
-      window.ws.logout().on('success', function(data, response) {
-        deferred.resolve(data, response);
-      }).on('error', function(error) {
-        deferred.reject(error);
-      });
-
-      return deferred.promise;
+      return deferSuccessAndError('logout', []);
     },
 
     set: function(id, object, options) {
-      deferred = $q.defer();
-
-      window.ws.set(id, object, options)
-      .on('success', function(data, response) {
-        deferred.resolve(data, response);
-      })
-      .on('error', function(err, response) {
-        deferred.reject(err, response);
-      });
-
-      return deferred.promise;
+      return deferSuccessAndError('set', [id, object, options]);
     },
 
     update: function(id, object, options) {
-      deferred = $q.defer();
-
-      window.ws.update(id, object, options)
-      .on('success', function(data, response) {
-        deferred.resolve(data, response);
-      })
-      .on('error', function(err, response) {
-        deferred.reject(err, response);
-      });
-
-      return deferred.promise;
+      return deferSuccessAndError('update', [id, object, options]);
     },
 
     login: function(email, password, options) {
-      deferred = $q.defer();
-
-      window.ws.login(email, password, options).on('success', function(data, response) {
-        deferred.resolve(data, response);
-      }).on('error', function(error) {
-        deferred.reject(error);
-      });
-
-      return deferred.promise;
+      return deferSuccessAndError('login', [email, password, options]);
     }
   };
 }]);

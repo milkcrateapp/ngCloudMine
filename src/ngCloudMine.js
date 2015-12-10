@@ -88,6 +88,7 @@ angular.module('ngCloudMine', [])
 
       return this.getSearchCount(query, options)
       .then(function(count) {
+        pager.count = count
         pager.pages = Math.ceil(count / pageCount);
 
         return pager;

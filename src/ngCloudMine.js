@@ -15,13 +15,21 @@ angular.module('ngCloudMine', [])
   };
 
   function deferSuccessAndError(method, args) {
+    return deferSuccessAndErrorWithHandlers(method, args);
+  };
+
+  function deferSuccessAndErrorWithHandlers(method, args, successHandler, errorHander) {
     var deferred = $q.defer();
 
     window.ws[method].apply(this, args)
-    .on('success', function(data) {
-      deferred.resolve(arrayify(data));
-    }).on('error', function(error) {
-      deferred.reject(error);
+    .on('success', function(data, meta) {
+      if (successHandler) successHandler(data, meta);
+
+      deferred.resolve(data);
+    }).on('error', function(err) {
+      if (errorHandler) errorHandler(err);
+
+      deferred.reject(err);
     });
 
     return deferred.promise;

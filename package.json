@@ -1,6 +1,6 @@
 {
-  "name": "ngCloudmine",
-  "version": "0.0.0",
+  "name": "ngCloudMine",
+  "version": "0.0.1",
   "description": "Angularifying the Cloudmine JS SDK.",
   "main": "index.js",
   "directories": {

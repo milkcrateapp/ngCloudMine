@@ -1,36 +1,39 @@
 describe('promise', function() {
   var wsStub = {
     search: function(){},
-    login: function(){}
-  };
-  var cloudmine = {
-    WebServices: function() {
-      return wsStub;
-    }
+    set: function(){},
+    update: function(){},
+    login: function(){},
+    logout: function(){}
   };
 
   var $rootScope = null;
   var cmWS = null;
 
   beforeEach(function() {
-    window.cloudmine = cloudmine;
     module('ngCloudMine');
   });
 
   beforeEach(function() {
     inject(function($injector) {
+      window.ws = wsStub;
       $rootScope = $injector.get('$rootScope');
       cmWS = $injector.get('cmWS');
     });
   });
 
   afterEach(function() {
-    if (wsStub.search.restore) {
-      wsStub.search.restore();
-    }
-    if (wsStub.login.restore) {
-      wsStub.login.restore();
-    }
+    var methodList = [
+      'search', 'set', 'update', 'login', 'logout'
+    ];
+
+    methodList.forEach(
+      function(method) {
+        if (wsStub[method].restore) {
+          wsStub[method].restore();
+        }
+      }
+    );
   });
 
   it('returns an angular promise when searching', function() {
@@ -73,6 +76,54 @@ describe('promise', function() {
     expect(wsStub.search.getCall(0).args[1]).to.deep.equal({option: '1'});
 
     expect(results).to.equal('data');
+  });
+
+  it('returns an angular promise when saving', function() {
+    expect(cmWS.set).to.be.ok;
+
+    sinon.stub(wsStub, 'set', function() {
+      return {
+        on: function() {
+          return {
+            on: function() {}
+          };
+        }
+      };
+    });
+
+    expect(cmWS.set().then).to.be.ok;
+  });
+
+  it('returns an angular promise when updating', function() {
+    expect(cmWS.update).to.be.ok;
+
+    sinon.stub(wsStub, 'update', function() {
+      return {
+        on: function() {
+          return {
+            on: function() {}
+          };
+        }
+      };
+    });
+
+    expect(cmWS.update().then).to.be.ok;
+  });
+
+  it('returns an angular promise when logging out', function() {
+    expect(cmWS.logout).to.be.ok;
+
+    sinon.stub(wsStub, 'logout', function() {
+      return {
+        on: function() {
+          return {
+            on: function() {}
+          };
+        }
+      };
+    });
+
+    expect(cmWS.logout().then).to.be.ok;
   });
 
   it('returns an angular promise when logging in', function() {

@@ -17,21 +17,6 @@ angular.module('ngCloudMine', [])
   };
 
   return {
-    getSearchCount: function(query, options) {
-      if (!options) {
-        options = {};
-      }
-
-      options.limit = 0;
-      options.count = true;
-
-      return deferSuccessAndError('search', [query, options]).then(
-        function (data) {
-          return data.cloudmineMeta.count;
-        }
-      );
-    },
-
     search: function(query, options) {
       return deferSuccessAndError('search', [query, options]);
     },
@@ -50,6 +35,37 @@ angular.module('ngCloudMine', [])
 
     login: function(email, password, options) {
       return deferSuccessAndError('login', [email, password, options]);
+    },
+
+    getSearchCount: function(query, options) {
+      if (!options) {
+        options = {};
+      }
+
+      options.applevel = true;
+      options.limit = 0;
+      options.count = true;
+
+      return deferSuccessAndError('search', [query, options]).then(
+        function (data) {
+          debugger;
+          return data.cloudmineMeta.count;
+        }
+      );
+    },
+
+    getPager: function(pageCount, query, options) {
+      var pager = {
+        query: query,
+        pages: null
+      };
+
+      return this.getSearchCount(query, options)
+      .then(function(count) {
+        pager.pages = Math.ceil(count / pageCount);
+
+        return pager;
+      });
     }
   };
 }]);

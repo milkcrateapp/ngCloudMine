@@ -45,4 +45,54 @@ describe('paginate', function() {
 
     expect(results).to.equal(4);
   });
+
+  describe('object', function() {
+
+    it('knows the pages count', function() {
+      expect(cmWS.getPager).to.be.ok;
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 6}]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query').then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      expect(wsStub.search.callCount).to.equal(1);
+      expect(wsStub.search.getCall(0).args[0]).to.equal('query');
+      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({
+        applevel: true,
+        limit: 0,
+        count: true
+      });
+
+      expect(pager.pages).to.equal(3);
+      expect(pager.query).to.equal('query');
+    });
+
+    it('knows the pages count with remainder', function() {
+      expect(cmWS.getPager).to.be.ok;
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 7}]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query').then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      expect(wsStub.search.callCount).to.equal(1);
+      expect(wsStub.search.getCall(0).args[0]).to.equal('query');
+      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({
+        applevel: true,
+        limit: 0,
+        count: true
+      });
+
+      expect(pager.pages).to.equal(4);
+      expect(pager.query).to.equal('query');
+    });
+
+  });
 });

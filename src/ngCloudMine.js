@@ -1,12 +1,25 @@
 angular.module('ngCloudMine', [])
 
 .service('cmWS', ['$q', function($q) {
+  function arrayify(data) {
+    var ary = [];
+
+    for (var key in data) {
+      var obj = data[key];
+
+      ary.push(obj);
+      ary[key] = data[key];
+    }
+
+    return ary;
+  };
+
   function deferSuccessAndError(method, args) {
     var deferred = $q.defer();
 
     window.ws[method].apply(this, args)
     .on('success', function(data) {
-      deferred.resolve(data);
+      deferred.resolve(arrayify(data));
     }).on('error', function(error) {
       deferred.reject(error);
     });

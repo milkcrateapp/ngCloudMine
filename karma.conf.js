@@ -18,6 +18,7 @@ module.exports = function(config) {
       'lib/angular.js',
       'lib/*.js',
       'src/*.js',
+      'test/support/*.js',
       'test/*Spec.js'
     ],
 

@@ -57,7 +57,22 @@ angular.module('ngCloudMine', [])
     getPager: function(pageCount, query, options) {
       var pager = {
         query: query,
-        pages: null
+        count: null,
+        pageCount: null,
+        pages: null,
+        getPage: function(page) {
+          if (page < 1 || page > this.pages) {
+            return $q.reject('Page doesn\'t exist');
+          }
+
+          var options = {
+            applevel: true,
+            limit: pageCount,
+            skip: (page - 1) * pageCount
+          };
+
+          return deferSuccessAndError('search', [query, options]);
+        }
       };
 
       return this.getSearchCount(query, options)

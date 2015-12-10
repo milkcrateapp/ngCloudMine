@@ -94,5 +94,46 @@ describe('paginate', function() {
       expect(pager.query).to.equal('query');
     });
 
+    it('can get pages', function() {
+      expect(cmWS.getPager).to.be.ok;
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 7}]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query').then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      pager.getPage(1);
+      pager.getPage(2);
+      pager.getPage(3);
+      pager.getPage(4);
+      $rootScope.$apply();
+
+      expect(wsStub.search.callCount).to.equal(5);
+      expect(wsStub.search.getCall(1).args[1]).to.deep.equal({
+        limit: 2,
+        skip: 0,
+        applevel: true
+      });
+      expect(wsStub.search.getCall(2).args[1]).to.deep.equal({
+        limit: 2,
+        skip: 2,
+        applevel: true
+      });
+      expect(wsStub.search.getCall(3).args[1]).to.deep.equal({
+        limit: 2,
+        skip: 4,
+        applevel: true
+      });
+      expect(wsStub.search.getCall(4).args[1]).to.deep.equal({
+        limit: 2,
+        skip: 6,
+        applevel: true
+      });
+
+    });
+
   });
 });

@@ -18,18 +18,22 @@ angular.module('ngCloudMine', [])
     return deferSuccessAndErrorWithHandlers(method, args);
   };
 
-  function deferSuccessAndErrorWithHandlers(method, args, successHandler, errorHander) {
+  function deferSuccessAndErrorWithHandlers(method, args, successHandler, errorHandler) {
     var deferred = $q.defer();
+
+    if (!successHandler) successHandler = function(data, meta, deferred) {
+      deferred.resolve(data);
+    };
+
+    if (!errorHandler) errorHandler = function(err, deferred) {
+      deferred.reject(err);
+    };
 
     window.ws[method].apply(window.ws, args)
     .on('success', function(data, meta) {
-      if (successHandler) successHandler(data, meta);
-
-      deferred.resolve(arrayify(data));
+      successHandler(arrayify(data), meta, deferred);
     }).on('error', function(err) {
-      if (errorHandler) errorHandler(err);
-
-      deferred.reject(err);
+      errorHandler(err, deferred);
     });
 
     return deferred.promise;
@@ -57,7 +61,6 @@ angular.module('ngCloudMine', [])
     },
 
     getSearchCount: function(query, options) {
-      var deferred = $q.defer();
       if (!options) {
         options = {};
       }
@@ -66,11 +69,9 @@ angular.module('ngCloudMine', [])
       options.limit = 0;
       options.count = true;
 
-      window.ws.search(query, options).on('success', function(data, meta) {
+      return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
         deferred.resolve(meta.count);
       });
-
-      return deferred.promise;
     },
 
     getPager: function(pageCount, query, options) {

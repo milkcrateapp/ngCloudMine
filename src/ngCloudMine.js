@@ -21,11 +21,11 @@ angular.module('ngCloudMine', [])
   function deferSuccessAndErrorWithHandlers(method, args, successHandler, errorHander) {
     var deferred = $q.defer();
 
-    window.ws[method].apply(this, args)
+    window.ws[method].apply(window.ws, args)
     .on('success', function(data, meta) {
       if (successHandler) successHandler(data, meta);
 
-      deferred.resolve(data);
+      deferred.resolve(arrayify(data));
     }).on('error', function(err) {
       if (errorHandler) errorHandler(err);
 
@@ -96,6 +96,7 @@ angular.module('ngCloudMine', [])
 
       return this.getSearchCount(query, options)
       .then(function(count) {
+        pager.count = count
         pager.pages = Math.ceil(count / pageCount);
 
         return pager;

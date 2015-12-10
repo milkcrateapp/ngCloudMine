@@ -5,11 +5,9 @@ angular.module('ngCloudMine', [])
     var deferred = $q.defer();
 
     window.ws[method].apply(this, args)
-    .on('success', function(data, cloudmineMeta) {
-      data.cloudmineMeta = cloudmineMeta;
+    .on('success', function(data) {
       deferred.resolve(data);
-    }).on('error', function(error, cloudmineMeta) {
-      error.cloudmineMeta = cloudmineMeta;
+    }).on('error', function(error) {
       deferred.reject(error);
     });
 
@@ -38,6 +36,7 @@ angular.module('ngCloudMine', [])
     },
 
     getSearchCount: function(query, options) {
+      var deferred = $q.defer();
       if (!options) {
         options = {};
       }
@@ -46,12 +45,11 @@ angular.module('ngCloudMine', [])
       options.limit = 0;
       options.count = true;
 
-      return deferSuccessAndError('search', [query, options]).then(
-        function (data) {
-          debugger;
-          return data.cloudmineMeta.count;
-        }
-      );
+      window.ws.search(query, options).on('success', function(data, meta) {
+        deferred.resolve(meta.count);
+      });
+
+      return deferred.promise;
     },
 
     getPager: function(pageCount, query, options) {

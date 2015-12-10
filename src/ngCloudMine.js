@@ -17,7 +17,7 @@ angular.module('ngCloudMine', [])
   function deferSuccessAndError(method, args) {
     var deferred = $q.defer();
 
-    window.ws[method].apply(this, args)
+    window.ws[method].apply(window.ws, args)
     .on('success', function(data) {
       deferred.resolve(arrayify(data));
     }).on('error', function(error) {

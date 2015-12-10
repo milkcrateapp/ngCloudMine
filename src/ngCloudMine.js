@@ -72,14 +72,14 @@ angular.module('ngCloudMine', [])
         pageCount: null,
         pages: null,
         getPage: function(page) {
-          if (page < 1 || page > this.pages) {
+          if (page < 0 || page >= this.pages) {
             return $q.reject('Page doesn\'t exist');
           }
 
           var options = {
             applevel: true,
             limit: pageCount,
-            skip: (page - 1) * pageCount
+            skip: page * pageCount
           };
 
           return deferSuccessAndError('search', [query, options]);

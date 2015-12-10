@@ -105,10 +105,10 @@ describe('paginate', function() {
       });
       $rootScope.$apply();
 
+      pager.getPage(0);
       pager.getPage(1);
       pager.getPage(2);
       pager.getPage(3);
-      pager.getPage(4);
       $rootScope.$apply();
 
       expect(wsStub.search.callCount).to.equal(5);

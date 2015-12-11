@@ -8,7 +8,7 @@ angular.module('ngCloudMine', [])
       var obj = data[key];
 
       ary.push(obj);
-      ary[key] = data[key];
+      ary[key] = obj;
     }
 
     return ary;

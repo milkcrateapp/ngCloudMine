@@ -67,7 +67,7 @@ describe('paginate', function() {
         count: true
       });
 
-      expect(pager.pages).to.equal(3);
+      expect(pager.totalPages).to.equal(3);
       expect(pager.query).to.equal('query');
     });
 
@@ -90,7 +90,7 @@ describe('paginate', function() {
         count: true
       });
 
-      expect(pager.pages).to.equal(4);
+      expect(pager.totalPages).to.equal(4);
       expect(pager.query).to.equal('query');
     });
 

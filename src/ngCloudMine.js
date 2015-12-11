@@ -74,21 +74,24 @@ angular.module('ngCloudMine', [])
       });
     },
 
-    getPager: function(pageCount, query, options) {
+    getPager: function(countPerPage, query, options) {
       var pager = {
         query: query,
-        count: null,
-        pageCount: null,
-        pages: null,
+        total: 0,
+        countPerPage: 0,
+        totalPages: 0,
+        page: 0,
         getPage: function(page) {
-          if (page < 0 || page >= this.pages) {
+          this.page = page;
+
+          if (page < 0 || page >= this.totalPages) {
             return $q.reject('Page doesn\'t exist');
           }
 
           var options = {
             applevel: true,
-            limit: pageCount,
-            skip: page * pageCount
+            limit: countPerPage,
+            skip: page * countPerPage
           };
 
           return deferSuccessAndError('search', [query, options]);
@@ -96,9 +99,9 @@ angular.module('ngCloudMine', [])
       };
 
       return this.getSearchCount(query, options)
-      .then(function(count) {
-        pager.count = count
-        pager.pages = Math.ceil(count / pageCount);
+      .then(function(total) {
+        pager.total = total;
+        pager.totalPages = Math.ceil(total / countPerPage);
 
         return pager;
       });

@@ -139,5 +139,27 @@ describe('paginate', function() {
 
     });
 
+    it('calls the updater', function() {
+
+      var updater = sinon.spy();
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([
+        {data: 'data'} , {count: 7}
+      ]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query', {applevel: true}, updater).then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+      pager.getPage(1);
+      $rootScope.$apply();
+
+      expect(updater.callCount).to.equal(1);
+      expect(updater.getCall(0).args[0].data).to.deep.equal('data');
+      expect(updater.getCall(0).args[0][0]).to.deep.equal('data');
+
+    });
+
   });
 });

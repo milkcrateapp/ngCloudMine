@@ -74,9 +74,15 @@ angular.module('ngCloudMine', [])
       });
     },
 
-    getPager: function(countPerPage, query, options) {
+    getPager: function(countPerPage, query, options, updater) {
       if (!options) {
         options = {applevel: true};
+      }
+
+      if (!updater) {
+        updater = function(data) {
+          return data;
+        };
       }
 
       var pager = {
@@ -96,7 +102,7 @@ angular.module('ngCloudMine', [])
           opts.limit = countPerPage;
           opts.skip = page * countPerPage;
 
-          return deferSuccessAndError('search', [query, opts]);
+          return deferSuccessAndError('search', [query, opts]).then(updater);
         }
       };
 

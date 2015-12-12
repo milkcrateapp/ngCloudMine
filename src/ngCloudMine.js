@@ -75,30 +75,32 @@ angular.module('ngCloudMine', [])
     },
 
     getPager: function(countPerPage, query, options) {
+      if (!options) {
+        options = {applevel: true};
+      }
+
       var pager = {
         query: query,
         total: 0,
-        countPerPage: 0,
+        countPerPage: countPerPage,
         totalPages: 0,
         page: 0,
         getPage: function(page) {
+          var opts = angular.copy(options);
           this.page = page;
 
           if (page < 0 || page >= this.totalPages) {
             return $q.reject('Page doesn\'t exist');
           }
 
-          var options = {
-            applevel: true,
-            limit: countPerPage,
-            skip: page * countPerPage
-          };
+          opts.limit = countPerPage;
+          opts.skip = page * countPerPage;
 
-          return deferSuccessAndError('search', [query, options]);
+          return deferSuccessAndError('search', [query, opts]);
         }
       };
 
-      return this.getSearchCount(query, options)
+      return this.getSearchCount(query, angular.copy(options))
       .then(function(total) {
         pager.total = total;
         pager.totalPages = Math.ceil(total / countPerPage);

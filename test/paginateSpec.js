@@ -94,13 +94,17 @@ describe('paginate', function() {
       expect(pager.query).to.equal('query');
     });
 
+  });
+
+  describe('pages', function() {
+
     it('can get pages', function() {
       expect(cmWS.getPager).to.be.ok;
 
-      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 7}]));
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{data: 'data'}, {count: 7}]));
 
       var pager = null;
-      cmWS.getPager(2, 'query').then(function(data) {
+      cmWS.getPager(2, 'query', {applevel: true}).then(function(data) {
         pager = data;
       });
       $rootScope.$apply();

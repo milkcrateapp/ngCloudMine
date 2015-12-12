@@ -85,12 +85,26 @@ angular.module('ngCloudMine', [])
         };
       }
 
+      function calcTotalPages(pager) {
+        pager.totalPages = Math.ceil(pager.total / pager.countPerPage);
+      };
+
       var pager = {
         query: query,
         total: 0,
         countPerPage: countPerPage,
         totalPages: 0,
         page: 0,
+        setPerPage: function(perPage) {
+          pager.countPerPage = perPage;
+          calcTotalPages(pager);
+
+          //TODO: Calculate new page to keep first item on page
+          this.page = 0;
+        },
+        setQuery: function(query) {
+          pager.query = query;
+        },
         getPage: function(page) {
           var opts = angular.copy(options);
           this.page = page;
@@ -99,17 +113,17 @@ angular.module('ngCloudMine', [])
             return $q.reject('Page doesn\'t exist');
           }
 
-          opts.limit = countPerPage;
-          opts.skip = page * countPerPage;
+          opts.limit = this.countPerPage;
+          opts.skip = page * this.countPerPage;
 
-          return deferSuccessAndError('search', [query, opts]).then(updater);
+          return deferSuccessAndError('search', [this.query, opts]).then(updater);
         }
       };
 
       return this.getSearchCount(query, angular.copy(options))
       .then(function(total) {
         pager.total = total;
-        pager.totalPages = Math.ceil(total / countPerPage);
+        calcTotalPages(pager);
 
         return pager;
       });

@@ -111,13 +111,14 @@ describe('paginate', function() {
       expect(pager.total).to.equal(7);
 
       pager.setQuery('new_query');
+      $rootScope.$apply();
       expect(pager.query).to.equal('new_query');
 
       pager.getPage(0);
       $rootScope.$apply();
 
-      expect(wsStub.search.getCall(1).args[0]).to.equal('new_query');
-      expect(wsStub.search.getCall(1).args[1]).to.deep.equal({
+      expect(wsStub.search.getCall(2).args[0]).to.equal('new_query');
+      expect(wsStub.search.getCall(2).args[1]).to.deep.equal({
         limit: 3,
         skip: 0,
         applevel: true

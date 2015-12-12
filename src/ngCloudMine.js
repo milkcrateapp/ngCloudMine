@@ -89,6 +89,17 @@ angular.module('ngCloudMine', [])
         pager.totalPages = Math.ceil(pager.total / pager.countPerPage);
       };
 
+      var self = this;
+      function calculateCount(pager) {
+        return self.getSearchCount(pager.query, angular.copy(options))
+        .then(function(total) {
+          pager.total = total;
+          calcTotalPages(pager);
+
+          return pager;
+        })
+      };
+
       var pager = {
         query: query,
         total: 0,
@@ -101,9 +112,14 @@ angular.module('ngCloudMine', [])
 
           //TODO: Calculate new page to keep first item on page
           this.page = 0;
+
+          var deferred = $q.defer();
+          deferred.resolve();
+          return deferred.promise;
         },
         setQuery: function(query) {
           pager.query = query;
+          return calculateCount(pager);
         },
         getPage: function(page) {
           var opts = angular.copy(options);
@@ -120,13 +136,7 @@ angular.module('ngCloudMine', [])
         }
       };
 
-      return this.getSearchCount(query, angular.copy(options))
-      .then(function(total) {
-        pager.total = total;
-        calcTotalPages(pager);
-
-        return pager;
-      });
+      return calculateCount(pager);
     }
   };
 }]);

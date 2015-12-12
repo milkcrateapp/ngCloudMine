@@ -94,6 +94,27 @@ describe('paginate', function() {
       expect(pager.query).to.equal('query');
     });
 
+    it('can change config', function() {
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 7}]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query').then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      pager.setPerPage(3);
+      expect(pager.countPerPage).to.equal(3);
+      expect(pager.page).to.equal(0);
+      expect(pager.totalPages).to.equal(3);
+      expect(pager.total).to.equal(7);
+
+      pager.setQuery('new_query');
+      expect(pager.query).to.equal('new_query');
+
+    });
+
   });
 
   describe('pages', function() {

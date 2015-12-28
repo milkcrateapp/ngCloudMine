@@ -1,6 +1,10 @@
 angular.module('ngCloudMine', [])
 
 .service('cmWS', ['$q', function($q) {
+  var distanceRE = /#{distance}/,
+      latRE = /#{lat}/,
+      longRE = /#{long}/;
+
   function arrayify(data) {
     var ary = [];
 
@@ -13,6 +17,30 @@ angular.module('ngCloudMine', [])
 
     return ary;
   };
+
+  function checkDistanceParams(query, options, distance, lat, long) {
+    var errorString = null;
+
+    if (!query) {
+      errorString = 'Missing query';
+    } else if (!options) {
+      errorString = 'Missing options';
+    } else if (!distance) {
+      errorString = 'Missing distance';
+    } else if (!lat) {
+      errorString = 'Missing latitude';
+    } else if (!long) {
+      errorString = 'Missing longitude';
+    } else if (!query.match(distanceRE)) {
+      errorString = 'Missing distance variable in query';
+    } else if (!query.match(latRE)) {
+      errorString = 'Missing latitude variable in query';
+    } else if (!query.match(longRE)) {
+      errorString = 'Missing longitude variable in query';
+    }
+
+    return errorString;
+  }
 
   function deferSuccessAndError(method, args) {
     return deferSuccessAndErrorWithHandlers(method, args);
@@ -68,6 +96,23 @@ angular.module('ngCloudMine', [])
       options.applevel = true;
       options.limit = 0;
       options.count = true;
+
+      return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
+        deferred.resolve(meta.count);
+      });
+    },
+
+    getDistanceCount: function(query, options, distance, lat, long) {
+      var errorMessage = checkDistanceParams(query, options, distance, lat, long);
+      if (errorMessage) {
+        return $q.reject(errorMessage);
+      }
+
+      options.limit = 0;
+      options.count = true;
+      query = query.replace(distanceRE, distance);
+      query = query.replace(latRE, lat);
+      query = query.replace(longRE, long);
 
       return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
         deferred.resolve(meta.count);

@@ -102,6 +102,49 @@ describe('distance', function() {
       expect(results).to.equal(4);
     });
 
+    it('does the query', function() {
+      expect(cmWS.getDistance).to.be.ok;
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([
+          {
+            biz1: {name: 'biz1'},
+            biz2: {name: 'biz2'},
+            biz3: {name: 'biz3'},
+            biz4: {name: 'biz4'}
+          },
+          {
+            biz1: {distance: 0.1},
+            biz2: {distance: 0.2},
+            biz3: {distance: 0.3},
+            biz4: {distance: 0.4}
+          }
+      ]));
+
+      var results = null;
+      cmWS.getDistance(
+        '[query, location near (#{long}, #{lat}), #{distance}mi]',
+        {applevel: true},
+        0.1,
+        1.23,
+        4.56
+      ).then(function(data) {
+        results = data;
+      });
+      $rootScope.$apply();
+
+      expect(wsStub.search.callCount).to.equal(1);
+      expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (4.56, 1.23), 0.1mi]');
+      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({applevel: true});
+      expect(results[0]).to.deep.equal({name: 'biz1', distance: 0.1});
+      expect(results.biz1).to.deep.equal({name: 'biz1', distance: 0.1});
+      expect(results[1]).to.deep.equal({name: 'biz2', distance: 0.2});
+      expect(results.biz2).to.deep.equal({name: 'biz2', distance: 0.2});
+      expect(results[2]).to.deep.equal({name: 'biz3', distance: 0.3});
+      expect(results.biz3).to.deep.equal({name: 'biz3', distance: 0.3});
+      expect(results[3]).to.deep.equal({name: 'biz4', distance: 0.4});
+      expect(results.biz4).to.deep.equal({name: 'biz4', distance: 0.4});
+    });
+
   });
 
 });

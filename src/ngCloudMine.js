@@ -42,6 +42,14 @@ angular.module('ngCloudMine', [])
     return errorString;
   }
 
+  function distanceQuery(query, distance, lat, long) {
+    query = query.replace(distanceRE, distance);
+    query = query.replace(latRE, lat);
+    query = query.replace(longRE, long);
+
+    return query;
+  };
+
   function deferSuccessAndError(method, args) {
     return deferSuccessAndErrorWithHandlers(method, args);
   };
@@ -110,12 +118,31 @@ angular.module('ngCloudMine', [])
 
       options.limit = 0;
       options.count = true;
-      query = query.replace(distanceRE, distance);
-      query = query.replace(latRE, lat);
-      query = query.replace(longRE, long);
+      query = distanceQuery(query, distance, lat, long);
 
       return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
         deferred.resolve(meta.count);
+      });
+    },
+
+    getDistance: function(query, options, distance, lat, long) {
+      var errorMessage = checkDistanceParams(query, options, distance, lat, long);
+      if (errorMessage) {
+        return $q.reject(errorMessage);
+      }
+
+      query = distanceQuery(query, distance, lat, long);
+
+      return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
+        for (metaKey in meta) {
+          var metaData = meta[metaKey];
+
+          if (data[metaKey] && meta[metaKey].distance) {
+            data[metaKey].distance = meta[metaKey].distance;
+          }
+        }
+
+        deferred.resolve(data);
       });
     },
 

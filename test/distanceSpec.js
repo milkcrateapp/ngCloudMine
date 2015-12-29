@@ -113,20 +113,17 @@ describe('distance', function() {
             biz4: {name: 'biz4'}
           },
           {
-            biz1: {distance: 0.1},
-            biz2: {distance: 0.2},
-            biz3: {distance: 0.3},
-            biz4: {distance: 0.4}
+            biz1: {geo: {distance: 0.1}},
+            biz2: {geo: {distance: 0.2}},
+            biz3: {geo: {distance: 0.3}},
+            biz4: {geo: {distance: 0.4}}
           }
       ]));
 
       var results = null;
       cmWS.getDistance(
         '[query, location near (#{long}, #{lat}), #{distance}mi]',
-        {applevel: true},
-        0.1,
-        1.23,
-        4.56
+        {applevel: true}, 0.1, 1.23, 4.56
       ).then(function(data) {
         results = data;
       });
@@ -134,7 +131,7 @@ describe('distance', function() {
 
       expect(wsStub.search.callCount).to.equal(1);
       expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (4.56, 1.23), 0.1mi]');
-      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({applevel: true});
+      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({applevel: true, distance: true});
       expect(results[0]).to.deep.equal({name: 'biz1', distance: 0.1});
       expect(results.biz1).to.deep.equal({name: 'biz1', distance: 0.1});
       expect(results[1]).to.deep.equal({name: 'biz2', distance: 0.2});

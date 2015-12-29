@@ -131,14 +131,15 @@ angular.module('ngCloudMine', [])
         return $q.reject(errorMessage);
       }
 
+      options.distance = true;
       query = distanceQuery(query, distance, lat, long);
 
       return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
         for (metaKey in meta) {
           var metaData = meta[metaKey];
 
-          if (data[metaKey] && meta[metaKey].distance) {
-            data[metaKey].distance = meta[metaKey].distance;
+          if (data[metaKey] && meta[metaKey].geo && meta[metaKey].geo.distance) {
+            data[metaKey].distance = meta[metaKey].geo.distance;
           }
         }
 
@@ -169,7 +170,7 @@ angular.module('ngCloudMine', [])
           calcTotalPages(pager);
 
           return pager;
-        })
+        });
       };
 
       var pager = {
@@ -178,6 +179,7 @@ angular.module('ngCloudMine', [])
         countPerPage: countPerPage,
         totalPages: 0,
         page: 0,
+
         setPerPage: function(perPage) {
           pager.countPerPage = perPage;
           calcTotalPages(pager);
@@ -189,10 +191,12 @@ angular.module('ngCloudMine', [])
           deferred.resolve();
           return deferred.promise;
         },
+
         setQuery: function(query) {
           pager.query = query;
           return calculateCount(pager);
         },
+
         getPage: function(page) {
           var opts = angular.copy(options);
           this.page = page;

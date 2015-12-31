@@ -106,18 +106,18 @@ describe('distance', function() {
       expect(cmWS.getDistance).to.be.ok;
 
       sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([
-          {
-            biz1: {name: 'biz1'},
-            biz2: {name: 'biz2'},
-            biz3: {name: 'biz3'},
-            biz4: {name: 'biz4'}
-          },
-          {
-            biz1: {geo: {distance: 0.1}},
-            biz2: {geo: {distance: 0.2}},
-            biz3: {geo: {distance: 0.3}},
-            biz4: {geo: {distance: 0.4}}
-          }
+        {
+          biz1: {name: 'biz1'},
+          biz2: {name: 'biz2'},
+          biz3: {name: 'biz3'},
+          biz4: {name: 'biz4'}
+        },
+        {
+          biz1: {geo: {distance: 0.1}},
+          biz2: {geo: {distance: 0.2}},
+          biz3: {geo: {distance: 0.3}},
+          biz4: {geo: {distance: 0.4}}
+        }
       ]));
 
       var results = null;

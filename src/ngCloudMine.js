@@ -213,6 +213,17 @@ angular.module('ngCloudMine', [])
       };
 
       return calculateCount(pager);
+    },
+
+    getDistancePager: function(countPerPage, query, distance, lat, long, options, updater) {
+      var errorMessage = checkDistanceParams(query, options, distance, lat, long);
+      if (errorMessage) {
+        return $q.reject(errorMessage);
+      }
+
+      query = distanceQuery(query, distance, lat, long);
+
+      return this.getPager(countPerPage, query, options, updater);
     }
   };
 }]);

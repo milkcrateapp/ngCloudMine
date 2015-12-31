@@ -144,4 +144,34 @@ describe('distance', function() {
 
   });
 
+  describe('object', function() {
+
+    it('creates', function() {
+      expect(cmWS.getDistancePager).to.be.ok;
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 6}]));
+
+      var pager = null;
+      cmWS.getDistancePager(2, '[query, location near (#{long}, #{lat}), #{distance}mi]', .2, 2.34, 5.67, {applevel: true}).then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      expect(wsStub.search.callCount).to.equal(1);
+      expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (5.67, 2.34), 0.2mi]');
+      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({
+        applevel: true,
+        limit: 0,
+        count: true
+      });
+
+      expect(pager.query).to.equal('[query, location near (5.67, 2.34), 0.2mi]');
+      expect(pager.countPerPage).to.equal(2);
+      expect(pager.page).to.equal(0);
+      expect(pager.total).to.equal(6);
+      expect(pager.totalPages).to.equal(3);
+    });
+
+  });
+
 });

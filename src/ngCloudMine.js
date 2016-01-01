@@ -131,13 +131,9 @@ angular.module('ngCloudMine', [])
       return $q.reject(errorMessage);
     }
 
-    options.limit = 0;
-    options.count = true;
-    query = distanceQuery(query, distance, lat, long);
-
-    return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
-      deferred.resolve(meta.count);
-    });
+    return service.getSearchCount(
+      distanceQuery(query, distance, lat, long), options
+    );
   };
 
   service.getDistance = function(query, options, distance, lat, long) {

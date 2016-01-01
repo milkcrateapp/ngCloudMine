@@ -229,7 +229,21 @@ angular.module('ngCloudMine', [])
       countPerPage,
       distanceQuery(query, distance, lat, long),
       options, updater
-    );
+    ).then(function(pager) {
+      pager.originalQuery = query;
+      pager.setDistanceLatAndLong = function(distance, lat, long) {
+        var newDistanceQuery = distanceQuery(
+          angular.copy(pager.originalQuery),
+          distance, lat, long
+        );
+
+        pager.query = newDistanceQuery;
+
+        return calculateCount(pager);
+      };
+
+      return pager;
+    });
   };
 
   return service;

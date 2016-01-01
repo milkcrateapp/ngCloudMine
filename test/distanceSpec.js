@@ -172,6 +172,21 @@ describe('distance', function() {
       expect(pager.totalPages).to.equal(3);
     });
 
+    it('changes distance and query', function() {
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 7}]));
+
+      var pager = null;
+      cmWS.getDistancePager(2, '[query, location near (#{long}, #{lat}), #{distance}mi]', .1, 1.23, 4.56)
+      .then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      pager.setDistanceLatAndLong(.2, 2.46, 10.12);
+      expect(wsStub.search.callCount).to.equal(2);
+      expect(pager.query).to.equal('[query, location near (10.12, 2.46), 0.2mi]');
+    });
+
   });
 
 });

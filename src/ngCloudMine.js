@@ -1,6 +1,8 @@
 angular.module('ngCloudMine', [])
 
 .service('cmWS', ['$q', function($q) {
+  var service = {};
+
   var distanceRE = /#{distance}/,
       latRE = /#{lat}/,
       longRE = /#{long}/;
@@ -50,6 +52,20 @@ angular.module('ngCloudMine', [])
     return query;
   };
 
+  function calculateCount(pager) {
+    return service.getSearchCount(pager.query, angular.copy(pager.options))
+    .then(function(total) {
+      pager.total = total;
+      calcTotalPages(pager);
+
+      return pager;
+    });
+  };
+
+  function calcTotalPages(pager) {
+    pager.totalPages = Math.ceil(pager.total / pager.countPerPage);
+  };
+
   function deferSuccessAndError(method, args) {
     return deferSuccessAndErrorWithHandlers(method, args);
   };
@@ -75,155 +91,146 @@ angular.module('ngCloudMine', [])
     return deferred.promise;
   };
 
-  return {
-    search: function(query, options) {
-      return deferSuccessAndError('search', [query, options]);
-    },
-
-    logout: function(email, password, options) {
-      return deferSuccessAndError('logout', []);
-    },
-
-    set: function(id, object, options) {
-      return deferSuccessAndError('set', [id, object, options]);
-    },
-
-    update: function(id, object, options) {
-      return deferSuccessAndError('update', [id, object, options]);
-    },
-
-    login: function(email, password, options) {
-      return deferSuccessAndError('login', [email, password, options]);
-    },
-
-    getSearchCount: function(query, options) {
-      if (!options) {
-        options = {};
-      }
-
-      options.applevel = true;
-      options.limit = 0;
-      options.count = true;
-
-      return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
-        deferred.resolve(meta.count);
-      });
-    },
-
-    getDistanceCount: function(query, options, distance, lat, long) {
-      var errorMessage = checkDistanceParams(query, options, distance, lat, long);
-      if (errorMessage) {
-        return $q.reject(errorMessage);
-      }
-
-      options.limit = 0;
-      options.count = true;
-      query = distanceQuery(query, distance, lat, long);
-
-      return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
-        deferred.resolve(meta.count);
-      });
-    },
-
-    getDistance: function(query, options, distance, lat, long) {
-      var errorMessage = checkDistanceParams(query, options, distance, lat, long);
-      if (errorMessage) {
-        return $q.reject(errorMessage);
-      }
-
-      options.distance = true;
-      query = distanceQuery(query, distance, lat, long);
-
-      return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
-        for (metaKey in meta) {
-          var metaData = meta[metaKey];
-
-          if (data[metaKey] && meta[metaKey].geo && meta[metaKey].geo.distance) {
-            data[metaKey].distance = meta[metaKey].geo.distance;
-          }
-        }
-
-        deferred.resolve(data);
-      });
-    },
-
-    getPager: function(countPerPage, query, options, updater) {
-      if (!options) {
-        options = {applevel: true};
-      }
-
-      if (!updater) {
-        updater = function(data) {
-          return data;
-        };
-      }
-
-      function calcTotalPages(pager) {
-        pager.totalPages = Math.ceil(pager.total / pager.countPerPage);
-      };
-
-      var self = this;
-      function calculateCount(pager) {
-        return self.getSearchCount(pager.query, angular.copy(options))
-        .then(function(total) {
-          pager.total = total;
-          calcTotalPages(pager);
-
-          return pager;
-        });
-      };
-
-      var pager = {
-        query: query,
-        total: 0,
-        countPerPage: countPerPage,
-        totalPages: 0,
-        page: 0,
-
-        setPerPage: function(perPage) {
-          pager.countPerPage = perPage;
-          calcTotalPages(pager);
-
-          //TODO: Calculate new page to keep first item on page
-          this.page = 0;
-
-          var deferred = $q.defer();
-          deferred.resolve();
-          return deferred.promise;
-        },
-
-        setQuery: function(query) {
-          pager.query = query;
-          return calculateCount(pager);
-        },
-
-        getPage: function(page) {
-          var opts = angular.copy(options);
-          this.page = page;
-
-          if (page < 0 || page >= this.totalPages) {
-            return $q.reject('Page doesn\'t exist');
-          }
-
-          opts.limit = this.countPerPage;
-          opts.skip = page * this.countPerPage;
-
-          return deferSuccessAndError('search', [this.query, opts]).then(updater);
-        }
-      };
-
-      return calculateCount(pager);
-    },
-
-    getDistancePager: function(countPerPage, query, distance, lat, long, options, updater) {
-      var errorMessage = checkDistanceParams(query, options, distance, lat, long);
-      if (errorMessage) {
-        return $q.reject(errorMessage);
-      }
-
-      query = distanceQuery(query, distance, lat, long);
-
-      return this.getPager(countPerPage, query, options, updater);
-    }
+  service.search = function(query, options) {
+    return deferSuccessAndError('search', [query, options]);
   };
+
+  service.logout = function(email, password, options) {
+    return deferSuccessAndError('logout', []);
+  };
+
+  service.set = function(id, object, options) {
+    return deferSuccessAndError('set', [id, object, options]);
+  };
+
+  service.update = function(id, object, options) {
+    return deferSuccessAndError('update', [id, object, options]);
+  };
+
+  service.login =  function(email, password, options) {
+    return deferSuccessAndError('login', [email, password, options]);
+  };
+
+  service.getSearchCount = function(query, options) {
+    if (!options) {
+      options = {};
+    }
+
+    options.applevel = true;
+    options.limit = 0;
+    options.count = true;
+
+    return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
+      deferred.resolve(meta.count);
+    });
+  };
+
+  service.getDistanceCount = function(query, options, distance, lat, long) {
+    var errorMessage = checkDistanceParams(query, options, distance, lat, long);
+    if (errorMessage) {
+      return $q.reject(errorMessage);
+    }
+
+    options.limit = 0;
+    options.count = true;
+    query = distanceQuery(query, distance, lat, long);
+
+    return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
+      deferred.resolve(meta.count);
+    });
+  };
+
+  service.getDistance = function(query, options, distance, lat, long) {
+    var errorMessage = checkDistanceParams(query, options, distance, lat, long);
+    if (errorMessage) {
+      return $q.reject(errorMessage);
+    }
+
+    options.distance = true;
+    query = distanceQuery(query, distance, lat, long);
+
+    return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
+      for (metaKey in meta) {
+        var metaData = meta[metaKey];
+
+        if (data[metaKey] && meta[metaKey].geo && meta[metaKey].geo.distance) {
+          data[metaKey].distance = meta[metaKey].geo.distance;
+        }
+      }
+
+      deferred.resolve(data);
+    });
+  };
+
+  service.getPager = function(countPerPage, query, options, updater) {
+    if (!options) {
+      options = {applevel: true};
+    }
+
+    if (!updater) {
+      updater = function(data) {
+        return data;
+      };
+    }
+
+    var pager = {
+      query: query,
+      total: 0,
+      countPerPage: countPerPage,
+      totalPages: 0,
+      page: 0,
+
+      setPerPage: function(perPage) {
+        pager.countPerPage = perPage;
+        calcTotalPages(pager);
+
+        //TODO: Calculate new page to keep first item on page
+        this.page = 0;
+
+        var deferred = $q.defer();
+        deferred.resolve();
+        return deferred.promise;
+      },
+
+      setQuery: function(query) {
+        pager.query = query;
+        return calculateCount(pager);
+      },
+
+      getPage: function(page) {
+        var opts = angular.copy(options);
+        this.page = page;
+
+        if (page < 0 || page >= this.totalPages) {
+          return $q.reject('Page doesn\'t exist');
+        }
+
+        opts.limit = this.countPerPage;
+        opts.skip = page * this.countPerPage;
+
+        return deferSuccessAndError('search', [this.query, opts]).then(updater);
+      }
+    };
+
+    return calculateCount(pager);
+  };
+
+  service.getDistancePager = function(countPerPage, query, distance, lat, long, options, updater) {
+    if (!options) {
+      options = {};
+    }
+
+    var errorMessage = checkDistanceParams(query, options, distance, lat, long);
+    if (errorMessage) {
+      return $q.reject(errorMessage);
+    }
+
+    return this.getPager(
+      countPerPage,
+      distanceQuery(query, distance, lat, long),
+      options, updater
+    );
+  };
+
+  return service;
 }]);

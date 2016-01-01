@@ -39,31 +39,13 @@ describe('promise', function() {
   it('returns an angular promise when searching', function() {
     expect(cmWS.search).to.be.ok;
 
-    sinon.stub(wsStub, 'search', function() {
-      return {
-        on: function() {
-          return {
-            on: function() {}
-          };
-        }
-      };
-    });
+    sinon.stub(wsStub, 'search', emptyCloudmineSuccessResponse);
 
     expect(cmWS.search().then).to.be.ok;
   });
 
   it('resolves the promise on success', function() {
-    sinon.stub(wsStub, 'search', function() {
-      return {
-        on: function(status, searchSuccess) {
-          searchSuccess('data');
-
-          return {
-            on: function() {}
-          };
-        }
-      };
-    });
+    sinon.stub(wsStub, 'search', setCloudmineSuccessResponse({data: 'data'}));
 
     var results = null;
     cmWS.search('query', {option: '1'}).then(function(data) {
@@ -75,21 +57,13 @@ describe('promise', function() {
     expect(wsStub.search.getCall(0).args[0]).to.equal('query');
     expect(wsStub.search.getCall(0).args[1]).to.deep.equal({option: '1'});
 
-    expect(results).to.equal('data');
+    expect(results.data).to.equal('data');
   });
 
   it('returns an angular promise when saving', function() {
     expect(cmWS.set).to.be.ok;
 
-    sinon.stub(wsStub, 'set', function() {
-      return {
-        on: function() {
-          return {
-            on: function() {}
-          };
-        }
-      };
-    });
+    sinon.stub(wsStub, 'set', emptyCloudmineSuccessResponse);
 
     expect(cmWS.set().then).to.be.ok;
   });
@@ -97,15 +71,7 @@ describe('promise', function() {
   it('returns an angular promise when updating', function() {
     expect(cmWS.update).to.be.ok;
 
-    sinon.stub(wsStub, 'update', function() {
-      return {
-        on: function() {
-          return {
-            on: function() {}
-          };
-        }
-      };
-    });
+    sinon.stub(wsStub, 'update', emptyCloudmineSuccessResponse);
 
     expect(cmWS.update().then).to.be.ok;
   });
@@ -113,15 +79,7 @@ describe('promise', function() {
   it('returns an angular promise when logging out', function() {
     expect(cmWS.logout).to.be.ok;
 
-    sinon.stub(wsStub, 'logout', function() {
-      return {
-        on: function() {
-          return {
-            on: function() {}
-          };
-        }
-      };
-    });
+    sinon.stub(wsStub, 'logout', emptyCloudmineSuccessResponse);
 
     expect(cmWS.logout().then).to.be.ok;
   });
@@ -129,15 +87,7 @@ describe('promise', function() {
   it('returns an angular promise when logging in', function() {
     expect(cmWS.login).to.be.ok;
 
-    sinon.stub(wsStub, 'login', function() {
-      return {
-        on: function() {
-          return {
-            on: function() {}
-          };
-        }
-      };
-    });
+    sinon.stub(wsStub, 'login', emptyCloudmineSuccessResponse);
 
     expect(cmWS.login().then).to.be.ok;
   });

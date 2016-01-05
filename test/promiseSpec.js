@@ -1,11 +1,14 @@
 describe('promise', function() {
-  var wsStub = {
-    search: function(){},
-    set: function(){},
-    update: function(){},
-    login: function(){},
-    logout: function(){}
-  };
+
+  var methodList = [
+    'search', 'set', 'update', 'login', 'logout'
+  ];
+
+  var wsStub = {};
+
+  methodList.forEach(function(method) {
+    wsStub[method] = function() {};
+  });
 
   var $rootScope = null;
   var cmWS = null;
@@ -23,17 +26,11 @@ describe('promise', function() {
   });
 
   afterEach(function() {
-    var methodList = [
-      'search', 'set', 'update', 'login', 'logout'
-    ];
-
-    methodList.forEach(
-      function(method) {
-        if (wsStub[method].restore) {
-          wsStub[method].restore();
-        }
+    methodList.forEach(function(method) {
+      if (wsStub[method].restore) {
+        wsStub[method].restore();
       }
-    );
+    });
   });
 
   it('returns an angular promise when searching', function() {
@@ -91,4 +88,5 @@ describe('promise', function() {
 
     expect(cmWS.login().then).to.be.ok;
   });
+
 });

@@ -107,8 +107,12 @@ angular.module('ngCloudMine', [])
     return deferSuccessAndError('update', [id, object, options]);
   };
 
-  service.login =  function(email, password, options) {
+  service.login = function(email, password, options) {
     return deferSuccessAndError('login', [email, password, options]);
+  };
+
+  service.getACL = function(acl_id, options) {
+    return deferSuccessAndError('getACL', [acl_id, options]);
   };
 
   service.getSearchCount = function(query, options) {

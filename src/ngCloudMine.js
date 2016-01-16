@@ -115,6 +115,10 @@ angular.module('ngCloudMine', [])
     return deferSuccessAndError('getACL', [acl_id, options]);
   };
 
+  service.getACLs = function(options) {
+    return deferSuccessAndError('getACLs', [options]);
+  };
+
   service.updateACL = function(acl, options) {
     return deferSuccessAndError('updateACL', [acl, options]);
   };

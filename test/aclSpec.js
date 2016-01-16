@@ -1,6 +1,6 @@
 describe('acl', function() {
 
-  var methodList = ['getACL'];
+  var methodList = ['getACL', 'updateACL'];
   var wsStub = {};
 
   methodList.forEach(function(method) {
@@ -39,6 +39,17 @@ describe('acl', function() {
 
     expect(wsStub.getACL.callCount).to.equal(1);
     expect(wsStub.getACL.getCall(0).args[0]).to.equal('id');
+  });
+
+  it('creates', function() {
+    expect(cmWS.updateACL).to.be.ok;
+
+    sinon.stub(wsStub, 'updateACL', emptyCloudmineSuccessResponse);
+
+    expect(cmWS.updateACL('ACL').then).to.be.ok;
+
+    expect(wsStub.updateACL.callCount).to.equal(1);
+    expect(wsStub.updateACL.getCall(0).args[0]).to.equal('ACL');
   });
 
 });

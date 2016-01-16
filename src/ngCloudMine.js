@@ -115,6 +115,10 @@ angular.module('ngCloudMine', [])
     return deferSuccessAndError('getACL', [acl_id, options]);
   };
 
+  service.updateACL = function(acl, options) {
+    return deferSuccessAndError('updateACL', [acl, options]);
+  };
+
   service.getSearchCount = function(query, options) {
     if (!options) {
       options = {};

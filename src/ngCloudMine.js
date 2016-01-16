@@ -111,6 +111,10 @@ angular.module('ngCloudMine', [])
     return deferSuccessAndError('login', [email, password, options]);
   };
 
+  service.run = function(snippet, params, options) {
+    return deferSuccessAndError('run', [snippet, params, options]);
+  };
+
   service.getACL = function(acl_id, options) {
     return deferSuccessAndError('getACL', [acl_id, options]);
   };

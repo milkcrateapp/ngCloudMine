@@ -1,7 +1,7 @@
 describe('promise', function() {
 
   var methodList = [
-    'search', 'set', 'update', 'login', 'logout'
+    'search', 'set', 'update', 'login', 'logout', 'run'
   ];
 
   var wsStub = {};
@@ -87,6 +87,14 @@ describe('promise', function() {
     sinon.stub(wsStub, 'login', emptyCloudmineSuccessResponse);
 
     expect(cmWS.login().then).to.be.ok;
+  });
+
+  it('returns an angular promise when running a snippet', function() {
+    expect(cmWS.run).to.be.ok;
+
+    sinon.stub(wsStub, 'run', emptyCloudmineSuccessResponse);
+
+    expect(cmWS.run().then).to.be.ok;
   });
 
 });

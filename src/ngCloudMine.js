@@ -91,6 +91,17 @@ angular.module('ngCloudMine', [])
     return deferred.promise;
   };
 
+  function deferResult(method, args) {
+    var deferred = $q.defer();
+
+    window.ws[method].apply(window.ws, args)
+    .on('result', function(data) {
+      deferred.resolve(data);
+    });
+
+    return deferred.promise;
+  };
+
   service.search = function(query, options) {
     return deferSuccessAndError('search', [query, options]);
   };
@@ -112,7 +123,7 @@ angular.module('ngCloudMine', [])
   };
 
   service.run = function(snippet, params, options) {
-    return deferSuccessAndError('run', [snippet, params, options]);
+    return deferResult('run', [snippet, params, options]);
   };
 
   service.getACL = function(acl_id, options) {

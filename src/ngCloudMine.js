@@ -140,10 +140,9 @@ angular.module('ngCloudMine', [])
 
   service.getSearchCount = function(query, options) {
     if (!options) {
-      options = {};
+      options = {applevel: true};
     }
 
-    options.applevel = true;
     options.limit = 0;
     options.count = true;
 
@@ -198,6 +197,7 @@ angular.module('ngCloudMine', [])
 
     var pager = {
       query: query,
+      options: options,
       total: 0,
       countPerPage: countPerPage,
       totalPages: 0,

@@ -12,6 +12,7 @@ angular.module('ngCloudMine', [])
 
     for (var key in data) {
       var obj = data[key];
+      obj.id = key;
 
       ary.push(obj);
       ary[key] = obj;

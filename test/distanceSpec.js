@@ -132,14 +132,14 @@ describe('distance', function() {
       expect(wsStub.search.callCount).to.equal(1);
       expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (4.56, 1.23), 0.1mi]');
       expect(wsStub.search.getCall(0).args[1]).to.deep.equal({applevel: true, distance: true});
-      expect(results[0]).to.deep.equal({name: 'biz1', distance: 0.1});
-      expect(results.biz1).to.deep.equal({name: 'biz1', distance: 0.1});
-      expect(results[1]).to.deep.equal({name: 'biz2', distance: 0.2});
-      expect(results.biz2).to.deep.equal({name: 'biz2', distance: 0.2});
-      expect(results[2]).to.deep.equal({name: 'biz3', distance: 0.3});
-      expect(results.biz3).to.deep.equal({name: 'biz3', distance: 0.3});
-      expect(results[3]).to.deep.equal({name: 'biz4', distance: 0.4});
-      expect(results.biz4).to.deep.equal({name: 'biz4', distance: 0.4});
+      expect(results[0]).to.deep.equal({name: 'biz1', id: 'biz1', distance: 0.1});
+      expect(results.biz1).to.deep.equal({name: 'biz1', id: 'biz1', distance: 0.1});
+      expect(results[1]).to.deep.equal({name: 'biz2', id: 'biz2', distance: 0.2});
+      expect(results.biz2).to.deep.equal({name: 'biz2', id: 'biz2', distance: 0.2});
+      expect(results[2]).to.deep.equal({name: 'biz3', id: 'biz3', distance: 0.3});
+      expect(results.biz3).to.deep.equal({name: 'biz3', id: 'biz3', distance: 0.3});
+      expect(results[3]).to.deep.equal({name: 'biz4', id: 'biz4', distance: 0.4});
+      expect(results.biz4).to.deep.equal({name: 'biz4', id: 'biz4', distance: 0.4});
     });
 
   });

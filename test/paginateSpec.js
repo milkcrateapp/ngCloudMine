@@ -71,6 +71,25 @@ describe('paginate', function() {
       expect(pager.query).to.equal('query');
     });
 
+    it('uses the correct options', function() {
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 6}]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query', {shared: true, applevel: false})
+      .then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({
+        applevel: false,
+        shared: true,
+        limit: 0,
+        count: true
+      });
+
+    });
+
     it('knows the pages count with remainder', function() {
       expect(cmWS.getPager).to.be.ok;
 

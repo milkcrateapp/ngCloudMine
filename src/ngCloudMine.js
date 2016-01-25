@@ -12,6 +12,7 @@ angular.module('ngCloudMine', [])
 
     for (var key in data) {
       var obj = data[key];
+      obj.id = key;
 
       ary.push(obj);
       ary[key] = obj;
@@ -91,6 +92,17 @@ angular.module('ngCloudMine', [])
     return deferred.promise;
   };
 
+  function deferResult(method, args) {
+    var deferred = $q.defer();
+
+    window.ws[method].apply(window.ws, args)
+    .on('result', function(data) {
+      deferred.resolve(data);
+    });
+
+    return deferred.promise;
+  };
+
   service.search = function(query, options) {
     return deferSuccessAndError('search', [query, options]);
   };
@@ -107,16 +119,31 @@ angular.module('ngCloudMine', [])
     return deferSuccessAndError('update', [id, object, options]);
   };
 
-  service.login =  function(email, password, options) {
+  service.login = function(email, password, options) {
     return deferSuccessAndError('login', [email, password, options]);
+  };
+
+  service.run = function(snippet, params, options) {
+    return deferResult('run', [snippet, params, options]);
+  };
+
+  service.getACL = function(acl_id, options) {
+    return deferSuccessAndError('getACL', [acl_id, options]);
+  };
+
+  service.getACLs = function(options) {
+    return deferSuccessAndError('getACLs', [options]);
+  };
+
+  service.updateACL = function(acl, options) {
+    return deferSuccessAndError('updateACL', [acl, options]);
   };
 
   service.getSearchCount = function(query, options) {
     if (!options) {
-      options = {};
+      options = {applevel: true};
     }
 
-    options.applevel = true;
     options.limit = 0;
     options.count = true;
 
@@ -131,13 +158,9 @@ angular.module('ngCloudMine', [])
       return $q.reject(errorMessage);
     }
 
-    options.limit = 0;
-    options.count = true;
-    query = distanceQuery(query, distance, lat, long);
-
-    return deferSuccessAndErrorWithHandlers('search', [query, options], function(data, meta, deferred) {
-      deferred.resolve(meta.count);
-    });
+    return service.getSearchCount(
+      distanceQuery(query, distance, lat, long), options
+    );
   };
 
   service.getDistance = function(query, options, distance, lat, long) {
@@ -175,6 +198,7 @@ angular.module('ngCloudMine', [])
 
     var pager = {
       query: query,
+      options: options,
       total: 0,
       countPerPage: countPerPage,
       totalPages: 0,

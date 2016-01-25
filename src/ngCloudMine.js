@@ -115,6 +115,10 @@ angular.module('ngCloudMine', [])
     return deferSuccessAndError('set', [id, object, options]);
   };
 
+  service.destroy = function(id, options) {
+    return deferSuccessAndError('destroy', [id, options]);
+  };
+
   service.update = function(id, object, options) {
     return deferSuccessAndError('update', [id, object, options]);
   };

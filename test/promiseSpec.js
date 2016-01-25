@@ -1,7 +1,7 @@
 describe('promise', function() {
 
   var methodList = [
-    'search', 'set', 'update', 'login', 'logout', 'run'
+    'search', 'set', 'destroy', 'update', 'login', 'logout', 'run'
   ];
 
   var wsStub = {};
@@ -63,6 +63,14 @@ describe('promise', function() {
     sinon.stub(wsStub, 'set', emptyCloudmineSuccessResponse);
 
     expect(cmWS.set().then).to.be.ok;
+  });
+
+  it('returns an angular promise when deleting', function() {
+    expect(cmWS.destroy).to.be.ok;
+
+    sinon.stub(wsStub, 'destroy', emptyCloudmineSuccessResponse);
+
+    expect(cmWS.destroy().then).to.be.ok;
   });
 
   it('returns an angular promise when updating', function() {

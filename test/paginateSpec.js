@@ -71,7 +71,7 @@ describe('paginate', function() {
       expect(pager.query).to.equal('query');
     });
 
-    it('uses the correction options', function() {
+    it('uses the correct options', function() {
       sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 6}]));
 
       var pager = null;

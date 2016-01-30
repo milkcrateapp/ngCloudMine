@@ -33,15 +33,8 @@ describe('promise', function() {
     });
   });
 
-  it('returns an angular promise when searching', function() {
+  it('returns and resolves angular promise when searching', function() {
     expect(cmWS.search).to.be.ok;
-
-    sinon.stub(wsStub, 'search', emptyCloudmineSuccessResponse);
-
-    expect(cmWS.search().then).to.be.ok;
-  });
-
-  it('resolves the promise on success', function() {
     sinon.stub(wsStub, 'search', setCloudmineSuccessResponse({data: 'data'}));
 
     var results = null;
@@ -57,44 +50,94 @@ describe('promise', function() {
     expect(results.data).to.equal('data');
   });
 
-  it('returns an angular promise when saving', function() {
+  it('returns and resolves promise when creating', function() {
     expect(cmWS.set).to.be.ok;
+    sinon.stub(wsStub, 'set', setCloudmineSuccessResponse({data: 'data'}));
 
-    sinon.stub(wsStub, 'set', emptyCloudmineSuccessResponse);
+    var results = null;
+    cmWS.set('id', {test: 'data'}, {options: '1'}).then(function(data) {
+      results = data;
+    });
+    $rootScope.$apply();
 
-    expect(cmWS.set().then).to.be.ok;
+    expect(wsStub.set.callCount).to.equal(1);
+    expect(wsStub.set.getCall(0).args[0]).to.equal('id');
+    expect(wsStub.set.getCall(0).args[1]).to.deep.equal({test: 'data'});
+    expect(wsStub.set.getCall(0).args[2]).to.deep.equal({options: '1'});
+
+    expect(results.data).to.equal('data');
   });
 
-  it('returns an angular promise when deleting', function() {
+  it('returns and resolves promise when deleting', function() {
     expect(cmWS.destroy).to.be.ok;
 
-    sinon.stub(wsStub, 'destroy', emptyCloudmineSuccessResponse);
+    sinon.stub(wsStub, 'destroy', setCloudmineSuccessResponse({data: 'data'}));
 
-    expect(cmWS.destroy().then).to.be.ok;
+    var results = null;
+    cmWS.destroy('id', {options: '1'}).then(function(data) {
+      results = data;
+    });
+    $rootScope.$apply();
+
+    expect(wsStub.destroy.callCount).to.equal(1);
+    expect(wsStub.destroy.getCall(0).args[0]).to.equal('id');
+    expect(wsStub.destroy.getCall(0).args[1]).to.deep.equal({options: '1'});
+
+    expect(results.data).to.equal('data');
   });
 
-  it('returns an angular promise when updating', function() {
+  it('returns and resolves promise when updating', function() {
     expect(cmWS.update).to.be.ok;
 
-    sinon.stub(wsStub, 'update', emptyCloudmineSuccessResponse);
+    sinon.stub(wsStub, 'update', setCloudmineSuccessResponse({data: 'data'}));
 
-    expect(cmWS.update().then).to.be.ok;
+    var results = null;
+    cmWS.update('id', {test: 'data'}, {options: '1'}).then(function(data) {
+      results = data;
+    });
+    $rootScope.$apply();
+
+    expect(wsStub.update.callCount).to.equal(1);
+    expect(wsStub.update.getCall(0).args[0]).to.equal('id');
+    expect(wsStub.update.getCall(0).args[1]).to.deep.equal({test: 'data'});
+    expect(wsStub.update.getCall(0).args[2]).to.deep.equal({options: '1'});
+
+    expect(results.data).to.equal('data');
   });
 
-  it('returns an angular promise when logging out', function() {
+  it('returns and resolves promise when logging out', function() {
     expect(cmWS.logout).to.be.ok;
 
-    sinon.stub(wsStub, 'logout', emptyCloudmineSuccessResponse);
+    sinon.stub(wsStub, 'logout', setCloudmineSuccessResponse({data: 'data'}));
 
-    expect(cmWS.logout().then).to.be.ok;
+    var results = null;
+    cmWS.logout().then(function(data) {
+      results = data;
+    });
+    $rootScope.$apply();
+
+    expect(wsStub.logout.callCount).to.equal(1);
+
+    expect(results.data).to.equal('data');
   });
 
-  it('returns an angular promise when logging in', function() {
+  it('returns and resolves promise when logging in', function() {
     expect(cmWS.login).to.be.ok;
 
-    sinon.stub(wsStub, 'login', emptyCloudmineSuccessResponse);
+    sinon.stub(wsStub, 'login', setCloudmineSuccessResponse({data: 'data'}));
 
-    expect(cmWS.login().then).to.be.ok;
+    var results = null;
+    cmWS.login('user', 'password', {options: '1'}).then(function(data) {
+      results = data;
+    });
+    $rootScope.$apply();
+
+    expect(wsStub.login.callCount).to.equal(1);
+    expect(wsStub.login.getCall(0).args[0]).to.equal('user');
+    expect(wsStub.login.getCall(0).args[1]).to.equal('password');
+    expect(wsStub.login.getCall(0).args[2]).to.deep.equal({options: '1'});
+
+    expect(results.data).to.equal('data');
   });
 
   it('returns an angular promise when running a snippet', function() {

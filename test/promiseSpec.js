@@ -143,9 +143,20 @@ describe('promise', function() {
   it('returns an angular promise when running a snippet', function() {
     expect(cmWS.run).to.be.ok;
 
-    sinon.stub(wsStub, 'run', emptyCloudmineSuccessResponse);
+    sinon.stub(wsStub, 'run', setCloudmineResultResponse({data: 'data'}));
 
-    expect(cmWS.run().then).to.be.ok;
+    var results = null;
+    cmWS.run('script', {param: 'param'}, {options: '1'}).then(function(data) {
+      results = data;
+    });
+    $rootScope.$apply();
+
+    expect(wsStub.run.callCount).to.equal(1);
+    expect(wsStub.run.getCall(0).args[0]).to.equal('script');
+    expect(wsStub.run.getCall(0).args[1]).to.deep.equal({param: 'param'});
+    expect(wsStub.run.getCall(0).args[2]).to.deep.equal({options: '1'});
+
+    expect(results.data).to.equal('data');
   });
 
 });

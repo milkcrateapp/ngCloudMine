@@ -6,6 +6,10 @@ function setCloudmineSuccessResponse(response) {
   return setCloudmineResponses({success: response});
 };
 
+function setCloudmineResultResponse(response) {
+  return setCloudmineResponses({result: response});
+};
+
 function setCloudmineResponses(responses) {
   var response;
 

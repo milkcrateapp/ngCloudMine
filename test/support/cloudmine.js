@@ -15,14 +15,14 @@ function setCloudmineResponses(responses) {
 
   response = {
     on: function(status, func) {
-          if (responses[status] && responses[status].length) {
-            func(responses[status][0], responses[status][1]);
-          } else if (responses[status]) {
-            func(responses[status]);
-          }
+      if (responses[status] && responses[status].length) {
+        func(responses[status][0], responses[status][1]);
+      } else if (responses[status]) {
+        func(responses[status]);
+      }
 
-          return response;
-        }
+      return response;
+    }
   };
 
   return function() {

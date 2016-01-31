@@ -216,6 +216,33 @@ describe('distance', function() {
       expect(results).to.deep.equal({distance: 24.3, count: 4});
     });
 
+    it('checks threshold when succeeds', function() {
+      wsStub.search = sinon.stub();
+
+      wsStub.search.onCall(0).returns(
+        setCloudmineSuccessResponse([{}, {count: 1}])()
+      );
+      wsStub.search.onCall(1).returns(
+        setCloudmineSuccessResponse([{}, {count: 2}])()
+      );
+      wsStub.search.onCall(2).returns(
+        setCloudmineSuccessResponse([{}, {count: 3}])()
+      );
+      wsStub.search.onCall(3).returns(
+        setCloudmineSuccessResponse([{}, {count: 8}])()
+      );
+
+      var results = null;
+      cmWS.getDistanceCountWithThreshold('[query, location near (#{long}, #{lat}), #{distance}mi]', {}, 5, 20, 1.23, 4.56).then(function(data) {
+        results = data;
+      });
+      $rootScope.$apply();
+
+      expect(wsStub.search.callCount).to.equal(4);
+
+      expect(results).to.deep.equal({distance: 2.7, count: 8});
+    });
+
   });
 
   describe('object', function() {

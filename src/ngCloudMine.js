@@ -167,7 +167,26 @@ angular.module('ngCloudMine', [])
     );
   };
 
-  service.getDistance = function(query, options, distance, lat, long) {
+  service.getDistanceCountWithThreshold =
+  function(query, options, minCount, maxDistance, lat, long, currentDistance) {
+    if (!currentDistance) {
+      currentDistance = 0.1;
+    }
+
+    return service.getSearchCount(
+      distanceQuery(query, currentDistance, lat, long), options
+    ).then(function(count) {
+      if (count >= minCount || currentDistance >= maxDistance) {
+        return {distance: currentDistance, count: count};
+      }
+
+      return service.getDistanceCountWithThreshold(
+        query, options, minCount, maxDistance, lat, long, 5 * currentDistance
+      );
+    });
+  };
+
+  service.getWithDistance = function(query, options, distance, lat, long) {
     var errorMessage = checkDistanceParams(query, options, distance, lat, long);
     if (errorMessage) {
       return $q.reject(errorMessage);

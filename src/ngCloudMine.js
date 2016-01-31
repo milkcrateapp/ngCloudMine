@@ -265,7 +265,7 @@ angular.module('ngCloudMine', [])
 
   service.getDistancePager = function(countPerPage, query, distance, lat, long, options, updater) {
     if (!options) {
-      options = {};
+      options = {applevel: true};
     }
 
     var errorMessage = checkDistanceParams(query, options, distance, lat, long);

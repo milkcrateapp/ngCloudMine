@@ -181,7 +181,8 @@ angular.module('ngCloudMine', [])
       }
 
       return service.getDistanceCountWithThreshold(
-        query, options, minCount, maxDistance, lat, long, 5 * currentDistance
+        query, options, minCount, maxDistance, lat, long,
+        Math.round(3 * currentDistance * 10) / 10
       );
     });
   };

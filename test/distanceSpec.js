@@ -144,7 +144,7 @@ describe('distance', function() {
       expect(results).to.equal(4);
     });
 
-    it('checks within threshold', function() {
+    it('checks threshold when fails', function() {
       wsStub.search = sinon.stub();
 
       wsStub.search.onCall(0).returns(
@@ -162,6 +162,12 @@ describe('distance', function() {
       wsStub.search.onCall(4).returns(
         setCloudmineSuccessResponse([{}, {count: 4}])()
       );
+      wsStub.search.onCall(5).returns(
+        setCloudmineSuccessResponse([{}, {count: 4}])()
+      );
+      wsStub.search.onCall(6).returns(
+        setCloudmineSuccessResponse([{}, {count: 4}])()
+      );
 
       var results = null;
       cmWS.getDistanceCountWithThreshold('[query, location near (#{long}, #{lat}), #{distance}mi]', {}, 5, 20, 1.23, 4.56).then(function(data) {
@@ -169,7 +175,7 @@ describe('distance', function() {
       });
       $rootScope.$apply();
 
-      expect(wsStub.search.callCount).to.equal(5);
+      expect(wsStub.search.callCount).to.equal(6);
 
       expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (4.56, 1.23), 0.1mi]');
       expect(wsStub.search.getCall(0).args[1]).to.deep.equal({
@@ -177,25 +183,37 @@ describe('distance', function() {
         count: true
       });
 
-      expect(wsStub.search.getCall(1).args[0]).to.equal('[query, location near (4.56, 1.23), 0.5mi]');
+      expect(wsStub.search.getCall(1).args[0]).to.equal('[query, location near (4.56, 1.23), 0.3mi]');
       expect(wsStub.search.getCall(1).args[1]).to.deep.equal({
         limit: 0,
         count: true
       });
 
-      expect(wsStub.search.getCall(2).args[0]).to.equal('[query, location near (4.56, 1.23), 2.5mi]');
+      expect(wsStub.search.getCall(2).args[0]).to.equal('[query, location near (4.56, 1.23), 0.9mi]');
       expect(wsStub.search.getCall(2).args[1]).to.deep.equal({
         limit: 0,
         count: true
       });
 
-      expect(wsStub.search.getCall(3).args[0]).to.equal('[query, location near (4.56, 1.23), 12.5mi]');
+      expect(wsStub.search.getCall(3).args[0]).to.equal('[query, location near (4.56, 1.23), 2.7mi]');
       expect(wsStub.search.getCall(3).args[1]).to.deep.equal({
         limit: 0,
         count: true
       });
 
-      expect(results).to.deep.equal({distance: 62.5, count: 4});
+      expect(wsStub.search.getCall(4).args[0]).to.equal('[query, location near (4.56, 1.23), 8.1mi]');
+      expect(wsStub.search.getCall(4).args[1]).to.deep.equal({
+        limit: 0,
+        count: true
+      });
+
+      expect(wsStub.search.getCall(5).args[0]).to.equal('[query, location near (4.56, 1.23), 24.3mi]');
+      expect(wsStub.search.getCall(5).args[1]).to.deep.equal({
+        limit: 0,
+        count: true
+      });
+
+      expect(results).to.deep.equal({distance: 24.3, count: 4});
     });
 
   });

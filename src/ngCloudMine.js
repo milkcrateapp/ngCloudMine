@@ -273,11 +273,15 @@ angular.module('ngCloudMine', [])
       return $q.reject(errorMessage);
     }
 
-    return this.getPager(
-      countPerPage,
-      distanceQuery(query, distance, lat, long),
-      options, updater
-    ).then(function(pager) {
+    return service.getDistanceCountWithThreshold(
+      query, options, countPerPage, distance, lat, long
+    ).then(function(threshold) {
+      return service.getPager(
+        countPerPage,
+        distanceQuery(query, distance, lat, long),
+        options, updater
+      );
+    }).then(function(pager) {
       pager.originalQuery = query;
       pager.setDistanceLatAndLong = function(distance, lat, long) {
         var newDistanceQuery = distanceQuery(

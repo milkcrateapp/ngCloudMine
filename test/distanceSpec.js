@@ -19,9 +19,7 @@ describe('distance', function() {
   });
 
   afterEach(function() {
-    if (wsStub.search.restore) {
-      wsStub.search.restore();
-    }
+    wsStub.search = function() {};
   });
 
   describe('query', function() {
@@ -83,27 +81,8 @@ describe('distance', function() {
 
     });
 
-    it('gets the count', function() {
-      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 4}]));
-
-      var results = null;
-      cmWS.getDistanceCount('[query, location near (#{long}, #{lat}), #{distance}mi]', {applevel: true}, 0.1, 1.23, 4.56).then(function(data) {
-        results = data;
-      });
-      $rootScope.$apply();
-
-      expect(wsStub.search.callCount).to.equal(1);
-      expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (4.56, 1.23), 0.1mi]');
-      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({
-        applevel: true,
-        limit: 0,
-        count: true
-      });
-      expect(results).to.equal(4);
-    });
-
     it('does the query', function() {
-      expect(cmWS.getDistance).to.be.ok;
+      expect(cmWS.getWithDistance).to.be.ok;
 
       sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([
         {
@@ -121,7 +100,7 @@ describe('distance', function() {
       ]));
 
       var results = null;
-      cmWS.getDistance(
+      cmWS.getWithDistance(
         '[query, location near (#{long}, #{lat}), #{distance}mi]',
         {applevel: true}, 0.1, 1.23, 4.56
       ).then(function(data) {
@@ -144,32 +123,172 @@ describe('distance', function() {
 
   });
 
+  describe('count', function() {
+
+    it('gets the count', function() {
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 4}]));
+
+      var results = null;
+      cmWS.getDistanceCount('[query, location near (#{long}, #{lat}), #{distance}mi]', {applevel: true}, 0.1, 1.23, 4.56).then(function(data) {
+        results = data;
+      });
+      $rootScope.$apply();
+
+      expect(wsStub.search.callCount).to.equal(1);
+      expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (4.56, 1.23), 0.1mi]');
+      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({
+        applevel: true,
+        limit: 0,
+        count: true
+      });
+      expect(results).to.equal(4);
+    });
+
+    it('checks threshold when fails', function() {
+      wsStub.search = sinon.stub();
+
+      wsStub.search.onCall(0).returns(
+        setCloudmineSuccessResponse([{}, {count: 1}])()
+      );
+      wsStub.search.onCall(1).returns(
+        setCloudmineSuccessResponse([{}, {count: 2}])()
+      );
+      wsStub.search.onCall(2).returns(
+        setCloudmineSuccessResponse([{}, {count: 3}])()
+      );
+      wsStub.search.onCall(3).returns(
+        setCloudmineSuccessResponse([{}, {count: 4}])()
+      );
+      wsStub.search.onCall(4).returns(
+        setCloudmineSuccessResponse([{}, {count: 4}])()
+      );
+      wsStub.search.onCall(5).returns(
+        setCloudmineSuccessResponse([{}, {count: 4}])()
+      );
+      wsStub.search.onCall(6).returns(
+        setCloudmineSuccessResponse([{}, {count: 4}])()
+      );
+
+      var results = null;
+      cmWS.getDistanceCountWithThreshold('[query, location near (#{long}, #{lat}), #{distance}mi]', {}, 5, 20, 1.23, 4.56).then(function(data) {
+        results = data;
+      });
+      $rootScope.$apply();
+
+      expect(wsStub.search.callCount).to.equal(6);
+
+      expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (4.56, 1.23), 0.1mi]');
+      expect(wsStub.search.getCall(0).args[1]).to.deep.equal({
+        limit: 0,
+        count: true
+      });
+
+      expect(wsStub.search.getCall(1).args[0]).to.equal('[query, location near (4.56, 1.23), 0.3mi]');
+      expect(wsStub.search.getCall(1).args[1]).to.deep.equal({
+        limit: 0,
+        count: true
+      });
+
+      expect(wsStub.search.getCall(2).args[0]).to.equal('[query, location near (4.56, 1.23), 0.9mi]');
+      expect(wsStub.search.getCall(2).args[1]).to.deep.equal({
+        limit: 0,
+        count: true
+      });
+
+      expect(wsStub.search.getCall(3).args[0]).to.equal('[query, location near (4.56, 1.23), 2.7mi]');
+      expect(wsStub.search.getCall(3).args[1]).to.deep.equal({
+        limit: 0,
+        count: true
+      });
+
+      expect(wsStub.search.getCall(4).args[0]).to.equal('[query, location near (4.56, 1.23), 8.1mi]');
+      expect(wsStub.search.getCall(4).args[1]).to.deep.equal({
+        limit: 0,
+        count: true
+      });
+
+      expect(wsStub.search.getCall(5).args[0]).to.equal('[query, location near (4.56, 1.23), 24.3mi]');
+      expect(wsStub.search.getCall(5).args[1]).to.deep.equal({
+        limit: 0,
+        count: true
+      });
+
+      expect(results).to.deep.equal({distance: 24.3, count: 4});
+    });
+
+    it('checks threshold when succeeds', function() {
+      wsStub.search = sinon.stub();
+
+      wsStub.search.onCall(0).returns(
+        setCloudmineSuccessResponse([{}, {count: 1}])()
+      );
+      wsStub.search.onCall(1).returns(
+        setCloudmineSuccessResponse([{}, {count: 2}])()
+      );
+      wsStub.search.onCall(2).returns(
+        setCloudmineSuccessResponse([{}, {count: 3}])()
+      );
+      wsStub.search.onCall(3).returns(
+        setCloudmineSuccessResponse([{}, {count: 8}])()
+      );
+
+      var results = null;
+      cmWS.getDistanceCountWithThreshold('[query, location near (#{long}, #{lat}), #{distance}mi]', {}, 5, 20, 1.23, 4.56).then(function(data) {
+        results = data;
+      });
+      $rootScope.$apply();
+
+      expect(wsStub.search.callCount).to.equal(4);
+
+      expect(results).to.deep.equal({distance: 2.7, count: 8});
+    });
+
+  });
+
   describe('object', function() {
 
     it('creates', function() {
       expect(cmWS.getDistancePager).to.be.ok;
 
-      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 6}]));
+      wsStub.search = sinon.stub();
+
+      wsStub.search.onCall(0).returns(
+        setCloudmineSuccessResponse([{}, {count: 4}])()
+      );
+      wsStub.search.onCall(1).returns(
+        setCloudmineSuccessResponse([{}, {count: 8}])()
+      );
+      wsStub.search.onCall(2).returns(
+        setCloudmineSuccessResponse([{}, {count: 52}])()
+      );
 
       var pager = null;
-      cmWS.getDistancePager(2, '[query, location near (#{long}, #{lat}), #{distance}mi]', .2, 2.34, 5.67, {applevel: true}).then(function(data) {
+      cmWS.getDistancePager(5, '[query, location near (#{long}, #{lat}), #{distance}mi]', 25, 2.34, 5.67, {applevel: true}).then(function(data) {
         pager = data;
       });
       $rootScope.$apply();
 
-      expect(wsStub.search.callCount).to.equal(1);
-      expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (5.67, 2.34), 0.2mi]');
+      expect(wsStub.search.callCount).to.equal(3);
+
+      expect(wsStub.search.getCall(0).args[0]).to.equal('[query, location near (5.67, 2.34), 0.1mi]');
       expect(wsStub.search.getCall(0).args[1]).to.deep.equal({
         applevel: true,
         limit: 0,
         count: true
       });
 
-      expect(pager.query).to.equal('[query, location near (5.67, 2.34), 0.2mi]');
-      expect(pager.countPerPage).to.equal(2);
+      expect(wsStub.search.getCall(1).args[0]).to.equal('[query, location near (5.67, 2.34), 0.3mi]');
+      expect(wsStub.search.getCall(1).args[1]).to.deep.equal({
+        applevel: true,
+        limit: 0,
+        count: true
+      });
+
+      expect(pager.query).to.equal('[query, location near (5.67, 2.34), 25mi]');
+      expect(pager.countPerPage).to.equal(5);
       expect(pager.page).to.equal(0);
-      expect(pager.total).to.equal(6);
-      expect(pager.totalPages).to.equal(3);
+      expect(pager.total).to.equal(52);
+      expect(pager.totalPages).to.equal(11);
     });
 
     it('changes distance and query', function() {
@@ -183,7 +302,7 @@ describe('distance', function() {
       $rootScope.$apply();
 
       pager.setDistanceLatAndLong(.2, 2.46, 10.12);
-      expect(wsStub.search.callCount).to.equal(2);
+      expect(wsStub.search.callCount).to.equal(3);
       expect(pager.query).to.equal('[query, location near (10.12, 2.46), 0.2mi]');
     });
 

@@ -167,7 +167,27 @@ angular.module('ngCloudMine', [])
     );
   };
 
-  service.getDistance = function(query, options, distance, lat, long) {
+  service.getDistanceCountWithThreshold =
+  function(query, options, minCount, maxDistance, lat, long, currentDistance) {
+    if (!currentDistance) {
+      currentDistance = 0.1;
+    }
+
+    return service.getSearchCount(
+      distanceQuery(query, currentDistance, lat, long), options
+    ).then(function(count) {
+      if (count >= minCount || currentDistance >= maxDistance) {
+        return {distance: currentDistance, count: count};
+      }
+
+      return service.getDistanceCountWithThreshold(
+        query, options, minCount, maxDistance, lat, long,
+        Math.round(3 * currentDistance * 10) / 10
+      );
+    });
+  };
+
+  service.getWithDistance = function(query, options, distance, lat, long) {
     var errorMessage = checkDistanceParams(query, options, distance, lat, long);
     if (errorMessage) {
       return $q.reject(errorMessage);
@@ -245,7 +265,7 @@ angular.module('ngCloudMine', [])
 
   service.getDistancePager = function(countPerPage, query, distance, lat, long, options, updater) {
     if (!options) {
-      options = {};
+      options = {applevel: true};
     }
 
     var errorMessage = checkDistanceParams(query, options, distance, lat, long);
@@ -253,11 +273,15 @@ angular.module('ngCloudMine', [])
       return $q.reject(errorMessage);
     }
 
-    return this.getPager(
-      countPerPage,
-      distanceQuery(query, distance, lat, long),
-      options, updater
-    ).then(function(pager) {
+    return service.getDistanceCountWithThreshold(
+      query, options, countPerPage, distance, lat, long
+    ).then(function(threshold) {
+      return service.getPager(
+        countPerPage,
+        distanceQuery(query, distance, lat, long),
+        options, updater
+      );
+    }).then(function(pager) {
       pager.originalQuery = query;
       pager.setDistanceLatAndLong = function(distance, lat, long) {
         var newDistanceQuery = distanceQuery(

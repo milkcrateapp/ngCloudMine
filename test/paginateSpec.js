@@ -68,6 +68,7 @@ describe('paginate', function() {
       });
 
       expect(pager.totalPages).to.equal(3);
+      expect(pager.page).to.equal(0);
       expect(pager.query).to.equal('query');
     });
 
@@ -145,6 +146,105 @@ describe('paginate', function() {
         skip: 0,
         applevel: true
       });
+
+    });
+
+    it('gets next page', function() {
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 7}]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query', {}).then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      pager.getPage(0);
+      pager.next();
+      $rootScope.$apply();
+
+      var args = ws.search.getCall(2).args;
+      expect(args[0]).to.equal('query');
+      expect(args[1]).to.deep.equal({
+        limit: 2,
+        skip: 2
+      });
+
+      expect(pager.page).to.equal(1);
+
+    });
+
+    it('gets prev page', function() {
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 7}]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query', {}).then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      pager.next();
+      pager.prev();
+      $rootScope.$apply();
+
+      var args = ws.search.getCall(2).args;
+      expect(args[0]).to.equal('query');
+      expect(args[1]).to.deep.equal({
+        limit: 2,
+        skip: 0
+      });
+
+      expect(pager.page).to.equal(0);
+
+    });
+
+    it('doesn\'t go past last page', function() {
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 7}]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query', {}).then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      pager.page = 3;
+      pager.next();
+      $rootScope.$apply();
+
+      var args = ws.search.getCall(1).args;
+      expect(args[0]).to.equal('query');
+      expect(args[1]).to.deep.equal({
+        limit: 2,
+        skip: 6
+      });
+
+      expect(pager.page).to.equal(3);
+
+    });
+
+    it('doesn\'t go before first page', function() {
+
+      sinon.stub(wsStub, 'search', setCloudmineSuccessResponse([{}, {count: 7}]));
+
+      var pager = null;
+      cmWS.getPager(2, 'query', {}).then(function(data) {
+        pager = data;
+      });
+      $rootScope.$apply();
+
+      pager.prev();
+      $rootScope.$apply();
+
+      var args = ws.search.getCall(1).args;
+      expect(args[0]).to.equal('query');
+      expect(args[1]).to.deep.equal({
+        limit: 2,
+        skip: 0
+      });
+
+      expect(pager.page).to.equal(0);
 
     });
 

@@ -247,16 +247,32 @@ angular.module('ngCloudMine', [])
 
       getPage: function(page) {
         var opts = angular.copy(options);
-        this.page = page;
 
         if (page < 0 || page >= this.totalPages) {
           return $q.reject('Page doesn\'t exist');
         }
 
+        this.page = page;
         opts.limit = this.countPerPage;
         opts.skip = page * this.countPerPage;
 
         return deferSuccessAndError('search', [this.query, opts]).then(updater);
+      },
+
+      next: function() {
+        if (this.page < this.totalPages - 1) {
+          this.page++;
+        }
+
+        return this.getPage(this.page);
+      },
+
+      prev: function() {
+        if (this.page > 0) {
+          this.page--;
+        }
+
+        return this.getPage(this.page);
       }
     };
 

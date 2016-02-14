@@ -1,31 +1,43 @@
 function emptyCloudmineSuccessResponse() {
-  return setCloudmineResponses({success: ''})();
+  return setCloudmineResponse({success: ''})();
 };
 
 function setCloudmineSuccessResponse(response) {
-  return setCloudmineResponses({success: response});
+  return setCloudmineResponse({success: response});
+};
+
+function setCloudmineFailResponse(response) {
+  return setCloudmineResponse({error: response});
 };
 
 function setCloudmineResultResponse(response) {
-  return setCloudmineResponses({result: response});
+  return setCloudmineResponse({result: response});
 };
 
-function setCloudmineResponses(responses) {
-  var response;
+function setCloudmineResponse(response) {
+  var retVal;
 
-  response = {
+  retVal = {
     on: function(status, func) {
-      if (responses[status] && responses[status].length) {
-        func(responses[status][0], responses[status][1]);
-      } else if (responses[status]) {
-        func(responses[status]);
+      if (response[status] && response[status].length) {
+        func(response[status][0], response[status][1]);
+      } else if (response[status]) {
+        func(response[status]);
       }
 
-      return response;
+      return retVal;
     }
   };
 
   return function() {
-    return response;
+    return retVal;
+  };
+}
+
+function setCloudmineResponses(responses) {
+  var callOn = 0;
+
+  return function() {
+    return setCloudmineResponse(responses[callOn++])();
   };
 }

@@ -143,6 +143,19 @@ angular.module('ngCloudMine', [])
     return deferSuccessAndError('updateACL', [acl, options]);
   };
 
+  service.thrice = function(type) {
+    var args = [];
+    for (var argOn=1; argOn<arguments.length; argOn++) {
+      args.push(arguments[argOn]);
+    }
+
+    return deferSuccessAndError(type, args).catch(function() {
+      return deferSuccessAndError(type, args);
+    }).catch(function() {
+      return deferSuccessAndError(type, args);
+    });
+  };
+
   service.getSearchCount = function(query, options) {
     if (!options) {
       options = {applevel: true};

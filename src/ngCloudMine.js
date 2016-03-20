@@ -143,6 +143,19 @@ angular.module('ngCloudMine', [])
     return deferSuccessAndError('updateACL', [acl, options]);
   };
 
+  service.thrice = function(type) {
+    var args = [];
+    for (var argOn=1; argOn<arguments.length; argOn++) {
+      args.push(arguments[argOn]);
+    }
+
+    return deferSuccessAndError(type, args).catch(function() {
+      return deferSuccessAndError(type, args);
+    }).catch(function() {
+      return deferSuccessAndError(type, args);
+    });
+  };
+
   service.getSearchCount = function(query, options) {
     if (!options) {
       options = {applevel: true};
@@ -247,16 +260,32 @@ angular.module('ngCloudMine', [])
 
       getPage: function(page) {
         var opts = angular.copy(options);
-        this.page = page;
 
         if (page < 0 || page >= this.totalPages) {
           return $q.reject('Page doesn\'t exist');
         }
 
+        this.page = page;
         opts.limit = this.countPerPage;
         opts.skip = page * this.countPerPage;
 
         return deferSuccessAndError('search', [this.query, opts]).then(updater);
+      },
+
+      next: function() {
+        if (this.page < this.totalPages - 1) {
+          this.page++;
+        }
+
+        return this.getPage(this.page);
+      },
+
+      prev: function() {
+        if (this.page > 0) {
+          this.page--;
+        }
+
+        return this.getPage(this.page);
       }
     };
 
